@@ -16,6 +16,13 @@ import org.apache.storm.shade.org.joda.time.DateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @Title: WordCountBolt
+ * @Package com.hyr.storm.demo.tick.blot
+ * @Description: tick 定时统计。 进行WordCount统计，定时每隔3秒发送WordCount统计的结果
+ * @author huangyueran
+ * @date 2017/11/22 0022 下午 4:50
+*/
 public class WordCountBolt extends BaseRichBolt {
 
     Map<String, Integer> _counts = new HashMap<String, Integer>();

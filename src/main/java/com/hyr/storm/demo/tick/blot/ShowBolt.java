@@ -1,19 +1,21 @@
 package com.hyr.storm.demo.tick.blot;
 
-import backtype.storm.Config;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
-import backtype.storm.utils.TupleUtils;
-import org.apache.storm.shade.org.joda.time.DateTime;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @Title: ShowBolt
+ * @Package com.hyr.storm.demo.tick.blot
+ * @Description: 打印统计的结果
+ * @author huangyueran
+ * @date 2017/11/22 0022 下午 4:51
+*/
 public class ShowBolt extends BaseRichBolt {
 
     Map<String, Integer> _counts = new HashMap<String, Integer>();

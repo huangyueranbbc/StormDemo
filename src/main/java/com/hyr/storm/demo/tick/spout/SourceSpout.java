@@ -11,6 +11,13 @@ import backtype.storm.utils.Utils;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * @Title: SourceSpout
+ * @Package com.hyr.storm.demo.tick.spout
+ * @Description: tick 定时统计 数据源,每隔6秒发送一次数据
+ * @author huangyueran
+ * @date 2017/11/22 0022 下午 4:49
+*/
 public class SourceSpout extends BaseRichSpout {
     SpoutOutputCollector _spoutOutputCollector;
     Random _random;

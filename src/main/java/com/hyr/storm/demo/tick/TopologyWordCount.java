@@ -7,7 +7,13 @@ import com.hyr.storm.demo.tick.blot.ShowBolt;
 import com.hyr.storm.demo.tick.blot.WordCountBolt;
 import com.hyr.storm.demo.tick.spout.SourceSpout;
 
-
+/**
+ * @Title: TopologyWordCount
+ * @Package com.hyr.storm.demo.tick
+ * @Description: tick 定时统计
+ * @author huangyueran
+ * @date 2017/11/22 0022 下午 4:49
+*/
 public class TopologyWordCount {
 
     public static void main(String[] args) throws Exception {
