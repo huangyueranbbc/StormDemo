@@ -1,26 +1,27 @@
 package com.hyr.storm.demo.partitionaggregate;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.AuthorizationException;
-import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.metric.LoggingMetricsConsumer;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
-import storm.trident.TridentTopology;
-import storm.trident.testing.FixedBatchSpout;
+
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
+import org.apache.storm.metric.LoggingMetricsConsumer;
+import org.apache.storm.trident.TridentTopology;
+import org.apache.storm.trident.testing.FixedBatchSpout;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.Utils;
 
 import java.io.IOException;
 
 /**
+ * @author huangyueran
  * @Title: MyPartitionAggregate
  * @Package com.hyr.storm.demo.partitionaggregate
  * @Description: Storm的PartitionAggregate
- * @author huangyueran
  * @date 2017/11/22 0022 上午 11:19
-*/
+ */
 public class MyPartitionAggregate {
 
     public static void main(String[] args) throws AlreadyAliveException,
@@ -33,8 +34,7 @@ public class MyPartitionAggregate {
         TridentTopology topology = new TridentTopology();
         topology.newStream("spout", spout)
                 .shuffle()
-                .partitionAggregate(new Fields("sentence"), new SumWord(),
-                        new Fields("sum"))
+                .partitionAggregate(new Fields("sentence"), new SumWord(), new Fields("sum"))
                 /**
                  * 设置3个并发度，可以理解为3个分区操作
                  */

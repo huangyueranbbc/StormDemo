@@ -1,14 +1,15 @@
 package com.hyr.storm.demo.metric;
 
-import backtype.storm.metric.api.CountMetric;
-import backtype.storm.metric.api.MeanReducer;
-import backtype.storm.metric.api.MultiCountMetric;
-import backtype.storm.metric.api.ReducedMetric;
-import backtype.storm.tuple.Values;
-import storm.trident.operation.BaseAggregator;
-import storm.trident.operation.TridentCollector;
-import storm.trident.operation.TridentOperationContext;
-import storm.trident.tuple.TridentTuple;
+
+import org.apache.storm.metric.api.CountMetric;
+import org.apache.storm.metric.api.MeanReducer;
+import org.apache.storm.metric.api.MultiCountMetric;
+import org.apache.storm.metric.api.ReducedMetric;
+import org.apache.storm.trident.operation.BaseAggregator;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.operation.TridentOperationContext;
+import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.tuple.Values;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +55,6 @@ public class SumWordAndMetric extends BaseAggregator<Map<String, Integer>> {
     private Map<String, Integer> state;
 
 
-    @Override
     public void prepare(Map conf, TridentOperationContext context) {
         state = new HashMap<String, Integer>();
         partitionId = context.getPartitionIndex();

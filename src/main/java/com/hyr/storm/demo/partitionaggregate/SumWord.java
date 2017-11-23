@@ -1,10 +1,11 @@
 package com.hyr.storm.demo.partitionaggregate;
 
-import backtype.storm.tuple.Values;
-import storm.trident.operation.BaseAggregator;
-import storm.trident.operation.TridentCollector;
-import storm.trident.operation.TridentOperationContext;
-import storm.trident.tuple.TridentTuple;
+
+import org.apache.storm.trident.operation.BaseAggregator;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.operation.TridentOperationContext;
+import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.tuple.Values;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,6 @@ public class SumWord extends BaseAggregator<Map<String, Integer>> {
     private Map<String, Integer> state;
 
 
-    @Override
     public void prepare(Map conf, TridentOperationContext context) {
         state = new HashMap<String, Integer>();
         partitionId = context.getPartitionIndex();
@@ -55,10 +55,12 @@ public class SumWord extends BaseAggregator<Map<String, Integer>> {
                 + ",batchId:" + batchId);
     }
 
+
     public Map<String, Integer> init(Object batchId, TridentCollector collector) {
         System.out.println("SumWord.init" + ";partitionId=" + partitionId + ";partitions=" + numPartitions
                 + ",batchId:" + batchId);
         this.batchId = batchId;
+        System.out.println("state=========="+state);
         return state;
     }
 
@@ -73,10 +75,10 @@ public class SumWord extends BaseAggregator<Map<String, Integer>> {
             val.put(word, 0);
         }
 
-        System.out.println("sumWord:" + val);
+        System.out.println("sumWord================" + val);
     }
 
     public void complete(Map<String, Integer> val, TridentCollector collector) {
         collector.emit(new Values(val));
     }
-} 
+}
