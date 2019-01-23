@@ -49,7 +49,7 @@ public class MyPartitionAggregate {
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("trident__partition_aggregate", config,
                 topology.build());
-        Utils.sleep(10000);
+        Utils.sleep(100000);
         cluster.killTopology("trident__partition_aggregate");
         cluster.shutdown();
     }

@@ -1,6 +1,7 @@
 package com.hyr.storm.demo.metric;
 
 
+import com.hyr.storm.demo.lifecycle.wordcount.blot.WordCountBlot;
 import org.apache.storm.metric.api.CountMetric;
 import org.apache.storm.metric.api.MeanReducer;
 import org.apache.storm.metric.api.MultiCountMetric;
@@ -10,6 +11,8 @@ import org.apache.storm.trident.operation.TridentCollector;
 import org.apache.storm.trident.operation.TridentOperationContext;
 import org.apache.storm.trident.tuple.TridentTuple;
 import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +25,8 @@ import java.util.Map;
  * @date 2017/11/22 0022 上午 11:17
 */
 public class SumWordAndMetric extends BaseAggregator<Map<String, Integer>> {
+
+    private static Logger logger = LoggerFactory.getLogger(SumWordAndMetric.class);
 
     /**
      *
@@ -64,7 +69,7 @@ public class SumWordAndMetric extends BaseAggregator<Map<String, Integer>> {
 
         initMetrics(context);
 
-        System.out.println("SumWord.prepare" + ";partitionId=" + partitionId + ";partitions=" + numPartitions
+        logger.info("SumWord.prepare" + ";partitionId=" + partitionId + ";partitions=" + numPartitions
                 + ",batchId:" + batchId);
     }
 
@@ -90,7 +95,7 @@ public class SumWordAndMetric extends BaseAggregator<Map<String, Integer>> {
     }
 
     public Map<String, Integer> init(Object batchId, TridentCollector collector) {
-        System.out.println("SumWord.init" + ";partitionId=" + partitionId + ";partitions=" + numPartitions
+        logger.info("SumWord.init" + ";partitionId=" + partitionId + ";partitions=" + numPartitions
                 + ",batchId:" + batchId);
         this.batchId = batchId;
         return state;
@@ -98,7 +103,7 @@ public class SumWordAndMetric extends BaseAggregator<Map<String, Integer>> {
 
 
     public void aggregate(Map<String, Integer> val, TridentTuple tuple, TridentCollector collector) {
-        System.out.println(tuple + ";partitionId=" + partitionId + ";partitions=" + numPartitions
+        logger.info(tuple + ";partitionId=" + partitionId + ";partitions=" + numPartitions
                 + ",batchId:" + batchId);
         String word = tuple.getString(0);
         if (null != val.get(word)) {
@@ -109,7 +114,7 @@ public class SumWordAndMetric extends BaseAggregator<Map<String, Integer>> {
 
         updateMetrics(tuple.getString(0)); // 更新计数器
 
-        System.out.println("sumWord:" + val);
+        logger.info("sumWord:" + val);
     }
 
     public void complete(Map<String, Integer> val, TridentCollector collector) {

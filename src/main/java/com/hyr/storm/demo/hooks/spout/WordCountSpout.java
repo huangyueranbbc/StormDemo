@@ -1,6 +1,5 @@
 package com.hyr.storm.demo.hooks.spout;
 
-import com.hyr.storm.demo.hooks.hook.MyHook;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;

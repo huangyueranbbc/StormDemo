@@ -18,6 +18,8 @@ import org.apache.storm.trident.testing.Split;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author huangyueran
@@ -27,6 +29,8 @@ import org.apache.storm.utils.Utils;
  * @date 2017/11/23 0023 下午 5:44
  */
 public class StormRAS {
+
+    private final static Logger logger = LoggerFactory.getLogger(StormRAS.class);
 
     public static void main(String[] args) {
         // FixedBatchSpout:数据流   Fields fields(标签), int maxBatchSize(每次输出多少Values,也就是输出List<Valuse>的长度), List... outputs(数据源输出的List<Values>)
@@ -75,13 +79,13 @@ public class StormRAS {
 
         Utils.sleep(10000);
 
-        System.out.println("单词统计 cat:" + client.execute("words", "cat")); // 计算key为cat的value(统计cat出现的次数)
-        System.out.println("单词统计 cat dog the man:" + client.execute("words", "cat dog the man"));
-        System.out.println("单词统计 dog:" + client.execute("words", "dog"));
-        System.out.println("单词统计 the:" + client.execute("words", "the"));
-        System.out.println("单词统计 candy:" + client.execute("words", "candy"));
+        logger.info("单词统计 cat:" + client.execute("words", "cat")); // 计算key为cat的value(统计cat出现的次数)
+        logger.info("单词统计 cat dog the man:" + client.execute("words", "cat dog the man"));
+        logger.info("单词统计 dog:" + client.execute("words", "dog"));
+        logger.info("单词统计 the:" + client.execute("words", "the"));
+        logger.info("单词统计 candy:" + client.execute("words", "candy"));
         // 输出JSON编码的结果: "[[5078]]"
-        System.out.println("============================");
+        logger.info("============================");
 
         System.exit(0);
 

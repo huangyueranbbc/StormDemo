@@ -13,6 +13,8 @@ import org.apache.storm.topology.base.BaseWindowedBolt;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.windowing.TupleWindow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -24,6 +26,9 @@ import java.util.Map;
  * @date 2017/11/23 0023 下午 6:28
  */
 public class SlidingWindowBolt extends BaseWindowedBolt {
+
+    private static Logger logger = LoggerFactory.getLogger(SlidingWindowBolt.class);
+
     private OutputCollector collector;
 
     @Override
@@ -41,7 +46,7 @@ public class SlidingWindowBolt extends BaseWindowedBolt {
             System.out.print(" " + str);
             s.append(str = "\t");
         }
-        System.out.println("}");
+        logger.info("}");
 
         collector.emit(new Values(s));
     }

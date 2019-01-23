@@ -1,11 +1,14 @@
 package com.hyr.storm.demo.reliability.spout;
 
+import com.hyr.storm.demo.stream.join.blot.SimpleJoinBolt;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.IRichSpout;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -17,6 +20,8 @@ import java.util.Map;
  * @date 2017/11/22 0022 上午 11:24
 */
 public class MessageSpout implements IRichSpout {
+
+    private final static Logger logger = LoggerFactory.getLogger(MessageSpout.class);
 
     private static final long serialVersionUID = -4664068313075450186L;
 
@@ -69,7 +74,7 @@ public class MessageSpout implements IRichSpout {
      * @param msgId
      */
     public void ack(Object msgId) {
-        System.out.println("message sends successfully (msgId = " + msgId + ")");
+        logger.info("message sends successfully (msgId = " + msgId + ")");
     }
 
     /**
@@ -78,10 +83,10 @@ public class MessageSpout implements IRichSpout {
      * @param msgId
      */
     public void fail(Object msgId) {
-        System.out.println("error : message sends unsuccessfully (msgId = " + msgId + ")");
-        System.out.println("resending...");
+        logger.info("error : message sends unsuccessfully (msgId = " + msgId + ")");
+        logger.info("resending...");
         _SpoutCollector.emit(new Values(lines[(Integer) msgId]), msgId); // 如果发送失败 则重新发送该数据
-        System.out.println("resend successfully");
+        logger.info("resend successfully");
     }
 
     public void close() {

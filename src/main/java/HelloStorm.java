@@ -1,3 +1,4 @@
+import com.hyr.storm.demo.tick.blot.WordCountBolt;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.LocalDRPC;
@@ -14,6 +15,8 @@ import org.apache.storm.trident.testing.Split;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Title: HelloStorm
@@ -24,10 +27,12 @@ import org.apache.storm.utils.Utils;
 */
 public class HelloStorm {
 
+    private static Logger logger = LoggerFactory.getLogger(HelloStorm.class);
+
     public static void main(String[] args) {
 
         // FixedBatchSpout:数据流   Fields fields(标签), int maxBatchSize(每次输出多少Values,也就是输出List<Valuse>的长度), List... outputs(数据源输出的List<Values>)
-        FixedBatchSpout spout = new FixedBatchSpout(new Fields("sentence"), 4, // 每次输出4个Values
+        FixedBatchSpoutDemo spout = new FixedBatchSpoutDemo(new Fields("sentence"), 4, // 每次输出4个Values
                 new Values("the cow jumped over the moon"),
                 new Values("the man went to the store and bought some candy"),
                 new Values("four score and seven years ago"),
@@ -39,15 +44,19 @@ public class HelloStorm {
         TridentTopology topology = new TridentTopology();
 
         // 创建wordCount状态
-        TridentState wordCounts = topology.newStream("spout1", spout) // 在拓扑中创建一个新的spout1数据流以便从输入源中读取数据
+        TridentState wordCounts = topology.newStream("spout1", spout)
+                .parallelismHint(3)// 在拓扑中创建一个新的spout1数据流以便从输入源中读取数据
+                .shuffle()
                 .each(new Fields("sentence"), new Split(), new Fields("word")) // 对每个输入的sentence"字段"，调用Split()函数进行处理。配合运行函数(或过滤器)
                 .groupBy(new Fields("word")) // 按特定的字段进行分组
                 // 持久化到内存       Count()持久合并的方法,对value进行合并(相加),如果是zero返回0L.
                 .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("count")) // 聚合函数，persistentAggregate实现的是将数据持久到特定的存储介质中
-                .parallelismHint(6); // 设置并行处理的数量
+                .parallelismHint(3); // 设置并行处理的数量
 
         LocalDRPC client = new LocalDRPC(); // comment in cluster mode
         topology.newDRPCStream("words", client /* don't pass client in cluster mode*/)
+                .parallelismHint(3)
+                .shuffle()
                 .each(new Fields("args"), new Split(), new Fields("word")) // 对于输入参数args，使用Split()方法进行切分,并以word作为字段发送
                 .groupBy(new Fields("word")) // 对word字段进行重新分区，保证相同的字段落入同一个分区
                 // stateQuery提供对已生成的TridentState对象的查询           MapGet()方法 根据输入Map的Key获取Value
@@ -63,13 +72,11 @@ public class HelloStorm {
 
         Utils.sleep(10000);
 
-        System.out.println("单词统计 cat:" + client.execute("words", "cat")); // 计算key为cat的value(统计cat出现的次数)
-        System.out.println("单词统计 cat dog the man:" + client.execute("words", "cat dog the man"));
-        System.out.println("单词统计 dog:" + client.execute("words", "dog"));
-        System.out.println("单词统计 the:" + client.execute("words", "the"));
-        System.out.println("单词统计 candy:" + client.execute("words", "candy"));
+        logger.info("单词统计 cow:" + client.execute("words", "cow")); // 计算key为cat的value(统计cat出现的次数)
+        logger.info("单词统计 bought some candy:" + client.execute("words", "bought some candy"));
+        logger.info("单词统计 apples:" + client.execute("words", "apples"));
         // 输出JSON编码的结果: "[[5078]]"
-        System.out.println("============================");
+        logger.info("============================");
 
         System.exit(0);
 

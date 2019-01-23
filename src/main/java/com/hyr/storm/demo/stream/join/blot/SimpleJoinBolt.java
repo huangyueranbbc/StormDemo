@@ -1,6 +1,7 @@
 package com.hyr.storm.demo.stream.join.blot;
 
 
+import com.hyr.storm.demo.lifecycle.wordcount.blot.SplitSentenceBlot;
 import org.apache.storm.Config;
 import org.apache.storm.generated.GlobalStreamId;
 import org.apache.storm.task.OutputCollector;
@@ -10,6 +11,8 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.utils.TimeCacheMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -17,6 +20,9 @@ import java.util.*;
  * 流合并 Stream Join
  */
 public class SimpleJoinBolt extends BaseRichBolt {
+
+    private final static Logger logger = LoggerFactory.getLogger(SimpleJoinBolt.class);
+
     private OutputCollector _collector;
     private Fields _outFields;
     private Fields _idFields;
@@ -38,9 +44,9 @@ public class SimpleJoinBolt extends BaseRichBolt {
         List<Object> id = tuple.select(_idFields);
         GlobalStreamId streamId = new GlobalStreamId(tuple.getSourceComponent(), tuple.getSourceStreamId());
         //打印当前处理元组的来源Spout
-        System.out.println("元组来源：" + tuple.getSourceComponent());
+        logger.info("元组来源：" + tuple.getSourceComponent());
         //打印当前元组
-        System.out.println("接收的元组：" + tuple.getFields().get(0) + " = " + tuple.getValues().get(0) + " , " + tuple.getFields().get(1) + " = " + tuple.getValues().get(1));
+        logger.info("接收的元组：" + tuple.getFields().get(0) + " = " + tuple.getValues().get(0) + " , " + tuple.getFields().get(1) + " = " + tuple.getValues().get(1));
         //如果当前pending中还不存在join key为此id的元组，则将该条记录加入
         if (!_pending.containsKey(id)) {
             _pending.put(id, new HashMap<GlobalStreamId, Tuple>());
@@ -66,7 +72,6 @@ public class SimpleJoinBolt extends BaseRichBolt {
             for (Object obj : joinResult) {
                 System.out.print(obj + " ");
             }
-            System.out.println();
 
             //多锚定
             _collector.emit(new ArrayList<Tuple>(parts.values()), joinResult);
@@ -74,7 +79,7 @@ public class SimpleJoinBolt extends BaseRichBolt {
                 _collector.ack(part);
             }
         } else {
-            System.out.println("只从一个关系流中收取到id值为" + id + "的元组，不可进行join操作");
+            logger.info("只从一个关系流中收取到id值为" + id + "的元组，不可进行join操作");
         }
     }
 
@@ -89,7 +94,7 @@ public class SimpleJoinBolt extends BaseRichBolt {
 
         Set<String> idFields = null;
         //遍历TopologyContext中不同的数据源:genderSpout和ageSpout
-        System.out.println(context.getThisSources().keySet());
+        logger.info("context.getThisSources().keySet()):{}",context.getThisSources().keySet());
         for (GlobalStreamId source : context.getThisSources().keySet()) {
             //得到公共的Fields字段id,保存到_idFields中
             Fields fields = context.getComponentOutputFields(source.get_componentId(), source.get_streamId());
@@ -100,7 +105,7 @@ public class SimpleJoinBolt extends BaseRichBolt {
             } else {
                 //求交集
                 idFields.retainAll(setFields);
-                System.out.println(idFields);
+                logger.info("idFields:{}",idFields);
             }
             //同时将_outFields中字段所在数据源记录下来，保存到一张HashMap _fieldLocations中，以便聚合后获取对应的字段值
             for (String outfield : _outFields) {
@@ -112,7 +117,7 @@ public class SimpleJoinBolt extends BaseRichBolt {
             }
             //打印结果:gender=GlobalStreamId(componentId=gender-spout,streamId=default)
             //age=GlobalStreamId(componentId=age-spout,streamId=default)
-            System.out.println(_fieldLocations);
+            logger.info("_fieldLocations:{}",_fieldLocations);
 
         }
         _idFields = new Fields(new ArrayList<String>(idFields));

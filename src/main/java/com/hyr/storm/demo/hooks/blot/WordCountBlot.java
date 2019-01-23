@@ -7,6 +7,9 @@ import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseBasicBolt;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +22,8 @@ import java.util.Map;
  * 4.execute(循环执行)
  */
 public class WordCountBlot extends BaseBasicBolt {
+
+    private final static Logger logger = LoggerFactory.getLogger(WordCountBlot.class);
 
     private HashMap<String, Integer> counterMapper = new HashMap<String, Integer>();
 
@@ -33,10 +38,10 @@ public class WordCountBlot extends BaseBasicBolt {
         if (counterMapper.containsKey(word)) { // 如果统计过这个单词 count++
             Integer count = counterMapper.get(word);
             count++;
-            System.out.println("wordCount receive " + word + " ------> " + count);
+            logger.info("wordCount receive " + word + " ------> " + count);
             counterMapper.put(word, count);
         } else { // 如果没有统计过这个单词 增加新词 count为1
-            System.out.println("wordCount receive " + word + " ------> " + 1);
+            logger.info("wordCount receive " + word + " ------> " + 1);
             counterMapper.put(word, 1);
         }
     }
@@ -53,7 +58,7 @@ public class WordCountBlot extends BaseBasicBolt {
     @Override
     public void cleanup() {
         for (String key : counterMapper.keySet()) {
-            System.out.println("total ---> " + key + " : " + counterMapper.get(key));
+            logger.info("total ---> " + key + " : " + counterMapper.get(key));
         }
     }
 

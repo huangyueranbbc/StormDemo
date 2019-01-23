@@ -1,11 +1,14 @@
 package com.hyr.storm.demo.tick.blot;
 
 
+import com.hyr.storm.demo.metric.SumWordAndMetric;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +20,8 @@ import java.util.Map;
  * @date 2017/11/22 0022 下午 4:51
 */
 public class ShowBolt extends BaseRichBolt {
+
+    private static Logger logger = LoggerFactory.getLogger(ShowBolt.class);
 
     Map<String, Integer> _counts = new HashMap<String, Integer>();
 
@@ -39,7 +44,7 @@ public class ShowBolt extends BaseRichBolt {
 
         // 打印
         for (Map.Entry<String, Integer> kv : _counts.entrySet()) {
-            System.out.println(kv.getKey() + "\t" + kv.getValue());
+            logger.info(kv.getKey() + "\t" + kv.getValue());
         }
     }
 

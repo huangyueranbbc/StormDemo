@@ -1,5 +1,6 @@
 package com.hyr.storm.demo.tick.blot;
 
+import com.hyr.storm.demo.lifecycle.wordcount.blot.WordCountBlot;
 import org.apache.storm.Config;
 import org.apache.storm.shade.org.joda.time.DateTime;
 import org.apache.storm.task.OutputCollector;
@@ -10,6 +11,8 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.TupleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +25,8 @@ import java.util.Map;
  * @date 2017/11/22 0022 下午 4:50
 */
 public class WordCountBolt extends BaseRichBolt {
+
+    private static Logger logger = LoggerFactory.getLogger(WordCountBolt.class);
 
     Map<String, Integer> _counts = new HashMap<String, Integer>();
 
@@ -43,17 +48,18 @@ public class WordCountBolt extends BaseRichBolt {
     }
 
     public void execute(Tuple tuple) {
+        logger.info("execute......");
         //时间窗口定义为3s内的统计数据，定时时间到期后，发射到下一阶段的bolt进行处理
         //发射完成后retun结束，开始新一轮的时间窗口计数操作
         if (TupleUtils.isTick(tuple)) { // 如果是定时的Tuple
-            System.out.println(new DateTime().toString("yyyy-MM-dd HH:mm:ss") + " 每隔3秒执行一次发送wordcount结果： 结果大小:" + _counts.size());
+            logger.info(new DateTime().toString("yyyy-MM-dd HH:mm:ss") + " 每隔3秒执行一次发送wordcount结果： 结果大小:" + _counts.size());
             _outputCollector.emit(new Values(_counts));//3秒发送一次
             _counts = new HashMap<String, Integer>();//这个地方，不能执行clear方法，可以再new一个对象，否则下游接受的数据，有可能为空 或者深度copy也行，推荐new
             return;
         }
 
         //如果没到定时时间，就继续统计wordcount
-        System.out.println("线程" + Thread.currentThread().getName() + "  map 缓冲统计中......  map size：" + _counts.size());
+        logger.info("线程" + Thread.currentThread().getName() + "  map 缓冲统计中......  map size：" + _counts.size());
         String word = tuple.getStringByField("words");
         Integer count = _counts.get(word);
         if (count == null) {

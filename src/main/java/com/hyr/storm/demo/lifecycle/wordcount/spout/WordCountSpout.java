@@ -1,5 +1,6 @@
 package com.hyr.storm.demo.lifecycle.wordcount.spout;
 
+import com.hyr.storm.demo.stream.join.blot.SimpleJoinBolt;
 import org.apache.storm.shade.org.apache.commons.io.FileUtils;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -7,6 +8,8 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +29,9 @@ import java.util.Random;
  * 6.deactivate
  */
 public class WordCountSpout extends BaseRichSpout {
+
+    private final static Logger logger = LoggerFactory.getLogger(WordCountSpout.class);
+
     SpoutOutputCollector _spoutOutputCollector;
     Random _random;
 
@@ -37,7 +43,8 @@ public class WordCountSpout extends BaseRichSpout {
      * @param spoutOutputCollector
      */
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
-        System.out.println("com.bonree.hyr.storm.spout.WordCountSpout.open doing......");
+        int taskIndex = topologyContext.getThisTaskIndex();
+        logger.info("com.hyr.storm.spout.WordCountSpout.open doing...... taskIndex:{}", taskIndex);
         _spoutOutputCollector = spoutOutputCollector;
         _random = new Random();
     }
@@ -46,7 +53,7 @@ public class WordCountSpout extends BaseRichSpout {
      * 反复调用
      */
     public void nextTuple() {
-        System.out.println("com.bonree.hyr.storm.spout.WordCountSpout.nextTuple doing......");
+        logger.info("com.hyr.storm.spout.WordCountSpout.nextTuple doing......");
         // TODO 读取文件
         // 读取文件列表
         Collection<File> listFiles = FileUtils.listFiles(new File("d:/test"), new String[]{"txt"}, true);
@@ -80,27 +87,27 @@ public class WordCountSpout extends BaseRichSpout {
         */
     }
 
-      /**
+    /**
      * 声明了该spout输出的字段个数，供下游使用。调用一次
      * 定义字段
      *
      * @param outputFieldsDeclarer
      */
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        System.out.println("com.bonree.hyr.storm.spout.WordCountSpout.declareOutputFields is doing......");
+        logger.info("com.hyr.storm.spout.WordCountSpout.declareOutputFields is doing......");
         // 定义字段
         outputFieldsDeclarer.declare(new Fields("sentence")); // 定义字段
     }
 
     @Override
     public void activate() {
-        System.out.println("com.bonree.hyr.storm.spout.WordCountSpout.activate is doing......");
+        logger.info("com.hyr.storm.spout.WordCountSpout.activate is doing......");
         super.activate();
     }
 
     @Override
     public void deactivate() {
-        System.out.println("com.bonree.hyr.storm.spout.WordCountSpout.deactivate is doing......");
+        logger.info("com.hyr.storm.spout.WordCountSpout.deactivate is doing......");
         super.deactivate();
     }
 }
